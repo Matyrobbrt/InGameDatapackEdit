@@ -1,0 +1,27 @@
+{
+  "tooltip.igde.tag_holds_values": "Holds %s values",
+  "tooltip.igde.delete": "Delete entry",
+  "tooltip.igde.optional_entry": "Optional entry",
+  "tooltip.igde.invalid_value": "Please provide a valid value!",
+  "tooltip.igde.duplicate_value": "The provided value is a duplicate!",
+
+  "gui.igde.added_objects": "Added Objects",
+  "gui.igde.removed_objects": "Removed Objects",
+  "gui.igde.tag_editor": "Tag Editor: %s",
+  "gui.igde.search": "Search",
+  "gui.igde.value": "Value",
+  "gui.igde.unsaved_changes": "You have unsaved changes! Are you sure you want to exit?",
+
+  "button.igde.replace": "Replace",
+  "button.igde.replace.on": "Replace existing",
+  "button.igde.replace.off": "Keep existing",
+  "button.igde.replace_values": "If existing values should be replaced.",
+
+  "button.igde.required.description": "If this entry should be required",
+  "button.igde.required": "Required",
+  "button.igde.required.off": "Optional",
+  "button.igde.required.on": "Required",
+
+  "button.igde.new_addition": "New Addition",
+  "button.igde.new_removal": "New Removal"
+}

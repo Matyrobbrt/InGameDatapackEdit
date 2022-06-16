@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.matyrobbrt.igde.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "igde.refmap.json",
+  "plugin": "com.matyrobbrt.igde.mixin.IGDEMixinPlugin",
+  "client": [
+    "jei.GuiScreenHelperMixin",
+    "jei.accessor.IngredientListOverlayAccessor",
+    "jei.accessor.GhostIngredientDragManagerAccessor",
+    "jei.RecipesGuiMixin",
+    "jei.GhostIngredientDragMixin"
+  ],
+  "minVersion": "0.8"
+}
