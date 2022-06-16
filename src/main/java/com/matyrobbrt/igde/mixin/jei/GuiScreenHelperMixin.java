@@ -1,5 +1,6 @@
 package com.matyrobbrt.igde.mixin.jei;
 
+import com.matyrobbrt.igde.client.screen.EditTagScreen;
 import com.matyrobbrt.igde.jei.DraggableScreen;
 import mezz.jei.gui.GuiScreenHelper;
 import net.minecraft.client.gui.screens.Screen;
@@ -25,9 +26,15 @@ public class GuiScreenHelperMixin {
         if (screen instanceof DraggableScreen draggableScreen) {
             final var set = new HashSet<>(cir.getReturnValue());
             final var pos = draggableScreen.getPosition();
-            if (pos != null)
-                set.add(pos);
+            set.add(pos);
             cir.setReturnValue(set);
+        } else if (screen instanceof EditTagScreen<?> tagScreen) {
+            if (tagScreen.getChild() != null) {
+                final var set = new HashSet<>(cir.getReturnValue());
+                final var pos = tagScreen.getChild().getPosition();
+                set.add(pos);
+                cir.setReturnValue(set);
+            }
         }
     }
 

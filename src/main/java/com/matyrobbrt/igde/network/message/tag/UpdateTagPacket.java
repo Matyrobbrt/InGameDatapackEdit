@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 
+// TODO could maybe use packet splitting
 public record UpdateTagPacket<T>(ResourceKey<Registry<T>> registry, ResourceLocation tag, Collection<TagEntry> added,
                                  Collection<TagEntry> removed, boolean replace) implements Packet {
     @Override

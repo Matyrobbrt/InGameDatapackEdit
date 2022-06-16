@@ -3,8 +3,7 @@ package com.matyrobbrt.igde.client.screen;
 import com.matyrobbrt.igde.InGameDatapackEdit;
 import com.matyrobbrt.igde.api.RegistryData;
 import com.matyrobbrt.igde.api.client.ObjectRenderer;
-import com.matyrobbrt.igde.jei.DraggableScreen;
-import com.matyrobbrt.igde.jei.JeiHelper;
+import com.matyrobbrt.igde.client.screen.base.ListMenuScreen;
 import com.matyrobbrt.igde.network.IGDENetwork;
 import com.matyrobbrt.igde.network.message.tag.TagData;
 import com.matyrobbrt.igde.network.message.tag.TagEntry;
@@ -28,11 +27,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
-public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen {
+public class EditTagScreen<T> extends ListMenuScreen {
     public static final ResourceLocation ICONS = new ResourceLocation(InGameDatapackEdit.MOD_ID, "textures/gui/icons.png");
 
     private final ResourceKey<Registry<T>> resourceKey;
@@ -68,11 +66,6 @@ public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen 
     @Nullable
     public MutateEntriesScreen getChild() {
         return child;
-    }
-
-    @Override
-    public Rect2i getPosition() {
-        return child == null ? null : child.getPosition();
     }
 
     @Override
@@ -146,25 +139,47 @@ public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen 
         }
     }
 
-    public final class MutateEntriesScreen extends Screen implements DraggableScreen {
+    public final class MutateEntriesScreen extends com.matyrobbrt.igde.client.screen.base.DraggableScreen {
 
         public static final int WIDTH = 176;
         public static final int HEIGHT = 60;
+        public static int cornerX;
+        public static int cornerY;
+        private static final PositionAccessor POS = new PositionAccessor() {
+            @Override
+            public void setCornerX(int cornerXIn) {
+                cornerX = cornerXIn;
+            }
+
+            @Override
+            public void setCornerY(int cornerYIn) {
+                cornerY = cornerYIn;
+            }
+
+            @Override
+            public int getCornerX() {
+                return cornerX;
+            }
+
+            @Override
+            public int getCornerY() {
+                return cornerY;
+            }
+        };
 
         public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation(InGameDatapackEdit.MOD_ID, "textures/gui/tag_mutation.png");
         private EditBox editBox;
-        public static int cornerX;
-        public static int cornerY;
+
         private CycleButton<Boolean> required;
         private Button doneButton;
         private Button cancelButton;
-        private Rect2i objectPos;
 
         private final TagEntryRenderer<T> entryRenderer;
         private final ActionType actionType;
+        private Rect2i objectPos;
 
         private MutateEntriesScreen(int cornerX, int cornerY, ActionType actionType) {
-            super(NarratorChatListener.NO_TITLE);
+            super(NarratorChatListener.NO_TITLE, POS, WIDTH, HEIGHT);
             // Only set the corners if not previously set
             if (MutateEntriesScreen.cornerX == 0)
                 MutateEntriesScreen.cornerX = cornerX;
@@ -198,12 +213,6 @@ public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen 
                 }
             }));
             cancelButton = this.addRenderableWidget(new Button(0, 0, 50, 20, CommonComponents.GUI_CANCEL, (p_97687_) -> this.onClose()));
-            updateChildren();
-        }
-
-        public void updatePos(int cornerX, int cornerY) {
-            MutateEntriesScreen.cornerX = cornerX;
-            MutateEntriesScreen.cornerY = cornerY;
             updateChildren();
         }
 
@@ -254,7 +263,9 @@ public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen 
                 editBox.setSuggestion("");
         }
 
+        @Override
         public void updateChildren() {
+            super.updateChildren();
             editBox.x = cornerX + 12 + renderer.getItemWidth();
             editBox.y = cornerY + 8 + (renderer.getItemHeight() - 20) / 2;
             final var secondLayerY = cornerY + 16 + renderer.getItemHeight();
@@ -264,37 +275,16 @@ public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen 
             required.y = secondLayerY;
             doneButton.y = secondLayerY;
             doneButton.x = cornerX + 5 + 2 * (50 + 7);
-
             objectPos = new Rect2i(cornerX + 7, cornerY + 8, renderer.getItemWidth(), renderer.getItemHeight());
-        }
-
-        public void updateValue(String value) {
-            this.editBox.setValue(value);
-            entryRenderer.updateValue(value);
         }
 
         public Rect2i getObjectPos() {
             return objectPos;
         }
 
-        private static int draggingXDistance;
-        private static int draggingYDistance;
-
-        @Override
-        public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-            for (final var children : children()) {
-                if (children.mouseClicked(pMouseX, pMouseY, pButton))
-                    return true;
-            }
-            if (!JeiHelper.isDraggingIngredient() &&
-                    cornerX <= pMouseX && pMouseX <= cornerX + WIDTH && cornerY <= pMouseY && cornerY <= cornerY + HEIGHT
-                    && pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-                setDragging(true);
-                draggingXDistance = (int) pMouseX - cornerX;
-                draggingYDistance = (int) pMouseY - cornerY;
-                return true;
-            }
-            return false;
+        public void updateValue(String value) {
+            this.editBox.setValue(value);
+            entryRenderer.updateValue(value);
         }
 
         @Override
@@ -305,14 +295,12 @@ public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen 
 
         @Override
         public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-            if (isDragging()) {
-                updatePos(pMouseX - draggingXDistance, pMouseY - draggingYDistance);
-            }
+            handleDragging(pMouseX, pMouseY);
 
             this.renderBackground(pPoseStack);
             editBox.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
             super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-            entryRenderer.render(this, pPoseStack, objectPos.getY(), objectPos.getX());
+            entryRenderer.render(this, pPoseStack, pos.getY(), pos.getX());
             ScreenUtil.drawWidgetTooltips(this, pPoseStack, pMouseX, pMouseY);
         }
 
@@ -325,11 +313,6 @@ public class EditTagScreen<T> extends ListMenuScreen implements DraggableScreen 
             Screen.blit(pPoseStack, cornerX, cornerY, getBlitOffset(), 0, 0, 176, 60, 256, 256);
             pPoseStack.popPose();
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.ScreenEvent.BackgroundDrawnEvent(this, pPoseStack));
-        }
-
-        @Override
-        public Rect2i getPosition() {
-            return new Rect2i(cornerX, cornerY, WIDTH, HEIGHT);
         }
     }
 

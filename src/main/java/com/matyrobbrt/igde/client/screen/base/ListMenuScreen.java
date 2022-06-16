@@ -1,6 +1,7 @@
-package com.matyrobbrt.igde.client.screen;
+package com.matyrobbrt.igde.client.screen.base;
 
 import com.google.common.collect.ImmutableList;
+import com.matyrobbrt.igde.client.screen.ScreenUtil;
 import com.matyrobbrt.igde.util.Translations;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.MethodsReturnNonnullByDefault;

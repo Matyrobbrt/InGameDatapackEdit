@@ -2,6 +2,7 @@ package com.matyrobbrt.igde.client.screen;
 
 import static com.matyrobbrt.igde.client.screen.EditTagScreen.ICONS;
 import com.matyrobbrt.igde.api.client.ObjectRenderer;
+import com.matyrobbrt.igde.client.screen.base.LabelProvider;
 import com.matyrobbrt.igde.util.Translations;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
