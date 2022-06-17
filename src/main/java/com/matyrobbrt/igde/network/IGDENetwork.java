@@ -7,6 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.event.EventNetworkChannel;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +15,12 @@ import java.util.List;
 import java.util.function.Function;
 
 public class IGDENetwork {
+    public static final EventNetworkChannel EXISTENCE_CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(InGameDatapackEdit.MOD_ID, "existence"))
+            .networkProtocolVersion(() -> "no.")
+            .serverAcceptedVersions(e -> true)
+            .clientAcceptedVersions(e -> true)
+            .eventNetworkChannel();
+
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(InGameDatapackEdit.MOD_ID, "channel"))
             .networkProtocolVersion(() -> "yes")
             .serverAcceptedVersions(e -> true)

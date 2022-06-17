@@ -16,6 +16,7 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -29,12 +30,16 @@ public class IGDECommands {
         final ResourceKey<Registry<Registry<?>>> rootReg = ResourceKey.createRegistryKey(new ResourceLocation("root"));
         event.getDispatcher().register(Commands.literal(MOD_ID)
                 .then(literal("tag")
-                        .requires(cs -> cs.hasPermission(2))
+                        .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("registry", ResourceKeyArgument.key(rootReg))
                                 .suggests(IGDECommands::suggestRegistries)
                                 .then(argument("tag", ResourceLocationArgument.id())
                                         .executes(ctx -> {
                                             final var sender = ctx.getSource().getPlayerOrException();
+                                            if (!IGDENetwork.EXISTENCE_CHANNEL.isRemotePresent(sender.connection.connection)) {
+                                                ctx.getSource().sendFailure(new TextComponent("Please install InGameDatapackEdit to use this feature."));
+                                                return Command.SINGLE_SUCCESS;
+                                            }
                                             IGDENetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sender),
                                                     OpenScreenPacket.make(
                                                             ctx.getSource().getServer(), getResourceKey(ctx, "registry", rootReg)
